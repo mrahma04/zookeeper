@@ -2,25 +2,24 @@ const express = require('express')
 const { animals } = require('./data/animals.json')
 
 const app = express()
-const PORT = process.env.PORT || 3001
 
-app.listen(PORT, () => {
-    console.log(`API server now on port ${PORT}!`)
-})
+const PORT = process.env.PORT || 3001
 
 function filterByQuery(query, animalsArray) {
     let personalityTraitsArray = []
     let filteredResults = animalsArray
     if (query.personalityTraits) {
-        if (typeof query.personalityTraits === 'string') {
-            personalityTraitsArray = [query.personalityTraits]
+        // if it's a single personalityTrait which would be a string
+        // put it inside an array
+        if (typeof query.personalityTraity === 'string') {
+            personalityTraitsArray = [query.personalityTraitsArray]
         } else {
             personalityTraitsArray = query.personalityTraits
         }
         personalityTraitsArray.forEach(trait => {
-            filteredResults = filteredResults.filter(
-                animal => animal.personalityTraits.indexOf(trait) !== -1
-            )
+            filteredResults = filteredResults.filter(animal => animal.personalityTraits.indexOf(trait) !== -1)
+            // indexOf will return a -1 if it is NOT present
+            // to match if it IS present, use !== -1
         })
     }
     if (query.diet) {
@@ -35,11 +34,6 @@ function filterByQuery(query, animalsArray) {
     return filteredResults
 }
 
-function findById(id, animalsArray) {
-    const result = animalsArray.filter(animal => animal.id === id)[0]
-    return result
-}
-
 app.get('/api/animals', (req, res) => {
     let results = animals
     if (req.query) {
@@ -48,11 +42,6 @@ app.get('/api/animals', (req, res) => {
     res.json(results)
 })
 
-app.get('/api/animals/:id', (req, res) => {
-    const result = findById(req.params.id, animals)
-    if (result) {
-        res.json(result)
-    } else {
-        res.send(404)
-    }
+app.listen(PORT, () => {
+    console.log(`API server now on port ${PORT}`)
 })
